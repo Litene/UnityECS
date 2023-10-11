@@ -1,7 +1,11 @@
-﻿using Unity.Entities;
+﻿using System;
+using Unity.Collections;
+using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Transforms;
+using Unity.VisualScripting;
 using UnityEngine;
+using Utility;
 
 namespace ComponentsAndTags {
 	public readonly partial struct GraveyardAspect : IAspect {
@@ -11,10 +15,21 @@ namespace ComponentsAndTags {
 
 		private readonly RefRO<GraveyardProperties> _graveyardProperties;
 		private readonly RefRW<GraveyardRandom> _graveyardRandom;
-
+		private readonly RefRW<ZombieSpawnPoints> _zombieSpawnPoints;
+		private readonly RefRW<ZombieSpawnTimer> _zombieSpawnTimer;
 		public int NumberToSpawn => _graveyardProperties.ValueRO.NumberOfTombstones;
 		public Entity TombStonePrefab => _graveyardProperties.ValueRO.TombstonePrefab;
 
+		public BlobArray<float3> ZombieSpawnPoints {
+			get => _zombieSpawnPoints.ValueRO.Value.Value.Value;
+			set => _zombieSpawnPoints.ValueRW.Value.Value.Value = value;
+		}
+
+		public bool ZombieSpawnPointInitialized() {
+			return _zombieSpawnPoints.ValueRO.Value.IsCreated && ZombieSpawnPointCount > 0;
+		}
+
+		private int ZombieSpawnPointCount => _zombieSpawnPoints.ValueRO.Value.Value.Value.Length;
 
 		public LocalTransform GetRandomTombstoneTransform() {
 			return new LocalTransform {
@@ -23,6 +38,21 @@ namespace ComponentsAndTags {
 				Scale = GetRandomScale(0.2f)
 			};
 		}
+
+		public LocalTransform GetZombieSpawnPoint() {
+			var position = GetRandomZombieSpawnPoint();
+			return new LocalTransform {
+				Position = position,
+				Rotation = quaternion.RotateY(MathHelper.GetHeading(position,_localTransform.ValueRO.Position)),
+				Scale = 1.0f
+			};
+		}
+
+		private float3 GetRandomZombieSpawnPoint() {
+			return GetZombieSpawnPoint(_graveyardRandom.ValueRW.Value.NextInt(ZombieSpawnPointCount));
+		}
+
+		private float3 GetZombieSpawnPoint(int i) => _zombieSpawnPoints.ValueRO.Value.Value.Value[i];
 
 		private float3 GetRandomPosition() {
 			float3 randomPosition;
@@ -41,6 +71,15 @@ namespace ComponentsAndTags {
 			y = 0f,
 			z = _graveyardProperties.ValueRO.FieldDimensions.y * 0.5f
 		};
+
+		public float ZombieSpawnRate => _graveyardProperties.ValueRO.ZombieSpawnRate;
+		public bool TimeToSpawnZombie => ZombieSpawnTimer <= 0.0f;
+		public Entity ZombiePrefab => _graveyardProperties.ValueRO.ZombiePrefab;
+		
+		public float ZombieSpawnTimer {
+			get => _zombieSpawnTimer.ValueRO.Value;
+			set => _zombieSpawnTimer.ValueRW.Value = value;
+		}
 
 		private const float BrainSafetyRadiusSQ = 100f;
 

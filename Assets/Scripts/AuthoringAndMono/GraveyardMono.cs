@@ -9,20 +9,26 @@ namespace AuthoringAndMono {
 		public float2 FieldDimensions;
 		public int NumbersOfTombStonesToSpawn;
 		public GameObject GravePrefab;
+		public GameObject ZombiePrefab;
 		public uint RandomSeed;
+		public float ZombieSpawnRate;
 	}
 
 	public class GraveyardBaker : Baker<GraveyardMono> {
-
 		public override void Bake(GraveyardMono authoring) {
-			AddComponent(new GraveyardProperties {
+			var entity = GetEntity(TransformUsageFlags.Dynamic);
+			AddComponent(entity, new GraveyardProperties {
 				FieldDimensions = authoring.FieldDimensions,
 				NumberOfTombstones = authoring.NumbersOfTombStonesToSpawn,
-				TombstonePrefab = GetEntity(authoring.GravePrefab)
+				TombstonePrefab = GetEntity(authoring.GravePrefab, TransformUsageFlags.Dynamic),
+				ZombiePrefab = GetEntity(authoring.ZombiePrefab, TransformUsageFlags.Dynamic),
+				ZombieSpawnRate = authoring.ZombieSpawnRate
 			});
-			AddComponent(new GraveyardRandom {
+			AddComponent(entity,new GraveyardRandom {
 				Value = Random.CreateFromIndex(authoring.RandomSeed)
 			});
+			AddComponent<ZombieSpawnPoints>(entity);
+			AddComponent<ZombieSpawnTimer>(entity);
 		}
 	}
 }
