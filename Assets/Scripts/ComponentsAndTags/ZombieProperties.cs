@@ -2,7 +2,7 @@
 
 namespace ComponentsAndTags {
 	public static class ZombieProperties {
-		public struct Walk : IComponentData {
+		public struct Walk : IComponentData, IEnableableComponent {
 			public float WalkSpeed;
 			public float WalkAmplitude;
 			public float WalkFrequency;
@@ -15,5 +15,11 @@ namespace ComponentsAndTags {
 		public struct RiseRate : IComponentData {
 			public float Value;
 		}
+		
+		public struct Heading : IComponentData {
+			public float Value;
+		}
+
+		public struct Tag : IComponentData {}
 	}
 }

@@ -5,6 +5,9 @@ using UnityEngine;
 namespace AuthoringAndMono {
 	public class ZombieMono : MonoBehaviour {
 		public float RiseRate;
+		public float WalkAmplitude;
+		public float WalkSpeed;
+		public float WalkFrequency;
 	}
 
 	public class ZombieBaker : Baker<ZombieMono> {
@@ -14,11 +17,14 @@ namespace AuthoringAndMono {
 			AddComponent(entity, new ZombieProperties.RiseRate{
 				Value = authoring.RiseRate
 			});
-			
-			// AddComponent(entity, new ZombieProperties.Walk {
-			// 	
-			// });
-			
+			AddComponent(entity, new ZombieProperties.Walk {
+				WalkAmplitude = authoring.WalkAmplitude,
+				WalkFrequency = authoring.WalkFrequency,
+				WalkSpeed = authoring.WalkSpeed
+			});
+			AddComponent<ZombieProperties.Timer>(entity);
+			AddComponent<ZombieProperties.Heading>(entity);
+			AddComponent<ZombieProperties.Tag>(entity);
 		}
 	}
 }

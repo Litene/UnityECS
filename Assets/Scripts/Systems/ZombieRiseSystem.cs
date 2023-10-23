@@ -9,11 +9,11 @@ namespace Systems {
 	[BurstCompile] [UpdateAfter(typeof(SpawnZombieSystem))] [UpdateBefore(typeof(TransformSystemGroup))]
 	public partial struct ZombieRiseSystem : ISystem {
 
-		public void OnCreate(ref SystemState state) {
+		[BurstCompile] public void OnCreate(ref SystemState state) {
 			state.RequireForUpdate<EndSimulationEntityCommandBufferSystem.Singleton>();
 		}
 
-		public void OnUpdate(ref SystemState state) {
+		[BurstCompile] public void OnUpdate(ref SystemState state) {
 			var deltaTime = SystemAPI.Time.DeltaTime;
 			var ecb = SystemAPI.GetSingleton<EndSimulationEntityCommandBufferSystem.Singleton>();
 			new ZombieRiseJob {
@@ -28,13 +28,13 @@ namespace Systems {
 		public float DeltaTime;
 		public EntityCommandBuffer.ParallelWriter ECB;
 
-		[BurstCompile]
-		public void Execute(ZombieRiseAspect zombie, [EntityIndexInQuery] int sortKey) {
+		[BurstCompile] public void Execute(ZombieRiseAspect zombie, [EntityIndexInQuery] int sortKey) {
 			zombie.Rise(DeltaTime);
 
 			if (!zombie.IsAboveGround) return;
 
 			ECB.RemoveComponent<ZombieProperties.RiseRate>(sortKey, zombie.Entity);
+			ECB.SetComponentEnabled<ZombieProperties.Walk>(sortKey, zombie.Entity, true);
 		}
 
 	}

@@ -170,7 +170,7 @@ MonoBehaviour:
   FieldDimensions:
     x: 40
     y: 40
-  NumbersOfTombStonesToSpawn: 250000
+  NumbersOfTombStonesToSpawn: 100
   GravePrefab: {fileID: 2234515111310992128, guid: 7fb5aacd3ff5b584fbf0d49b08c3e348, type: 3}
   ZombiePrefab: {fileID: 2667870150566584460, guid: 9626a072548d1ac4ab78621196816e87, type: 3}
   RandomSeed: 100
